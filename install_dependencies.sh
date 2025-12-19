@@ -1,4 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+# Always operate relative to this script's folder
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+cd "$SCRIPT_DIR" || { echo "Failed to cd to script directory"; exit 1; }
 
 # Function to check Python version
 check_python_version() {
@@ -35,9 +39,41 @@ check_python_version
 # Detect OS
 OS_TYPE="$(uname)"
 
+# Ask user what they want to do
+echo
+echo "❓ What would you like to do?"
+select ACTION in "Full installation" "Download models only (Only needed if the models fail to download)" "Exit"; do
+    case $ACTION in
+        "Full installation")
+            echo "Proceeding with full installation..."
+            break
+            ;;
+        "Download models only (Only needed if the models fail to download)")
+            echo "Downloading models..."
+            if [ -d "venv" ]; then
+                source venv/bin/activate
+            fi
+            python3 sammie/download_models.py
+            echo "✅ Model download complete!"
+            exit 0
+            ;;
+        "Exit")
+            echo "Exiting..."
+            exit 0
+            ;;
+        *)
+            echo "Invalid option. Please choose 1, 2, or 3."
+            ;;
+    esac
+done
+
 # Create and activate virtual environment
-echo "Creating Python virtual environment..."
-python3 -m venv venv
+if [ -d "venv" ]; then
+    echo "Virtual environment already exists. Skipping creation..."
+else
+    echo "Creating Python virtual environment..."
+    python3 -m venv venv
+fi
 source venv/bin/activate
 
 # Upgrade pip and install wheel
@@ -49,7 +85,7 @@ pip3 install wheel
 # Install PyTorch
 if [[ "$OS_TYPE" == "Darwin" ]]; then
     echo "Detected macOS. Installing PyTorch..."
-    pip3 install torch==2.9.0 torchvision
+    pip3 install torch==2.9.1 torchvision
 elif [[ "$OS_TYPE" == "Linux" ]]; then
     echo "Detected Linux."
 	echo
@@ -58,22 +94,22 @@ elif [[ "$OS_TYPE" == "Linux" ]]; then
         case $PT_VERSION in
             "CUDA 12.8 (For modern NVIDIA GPUs, RTX)")
                 echo "Installing PyTorch with CUDA 12.8..."
-                pip3 install torch==2.9.0 torchvision --index-url https://download.pytorch.org/whl/cu128
+                pip3 install torch==2.9.1 torchvision --index-url https://download.pytorch.org/whl/cu128
                 break
                 ;;
             "CUDA 12.6 (For old NVIDIA GPUs, GXT)")
                 echo "Installing PyTorch with CUDA 12.6..."
-                pip3 install torch==2.9.0 torchvision --index-url https://download.pytorch.org/whl/cu126
+                pip3 install torch==2.9.1 torchvision --index-url https://download.pytorch.org/whl/cu126
                 break
                 ;;
             "ROCm (Radeon)")
                 echo "Installing PyTorch with ROCm 6.4..."
-                pip3 install torch==2.9.0 torchvision --index-url https://download.pytorch.org/whl/rocm6.4
+                pip3 install torch==2.9.1 torchvision --index-url https://download.pytorch.org/whl/rocm6.4
                 break
                 ;;
             CPU)
                 echo "Installing CPU-only version of PyTorch..."
-                pip3 install torch==2.9.0 torchvision --index-url https://download.pytorch.org/whl/cpu
+                pip3 install torch==2.9.1 torchvision --index-url https://download.pytorch.org/whl/cpu
                 break
                 ;;
             *)
