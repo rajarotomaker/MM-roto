@@ -365,7 +365,7 @@ class MatAnyManager:
             device = DeviceManager.get_device()
         checkpoint = "./checkpoints/matanyone.pth"
         matanyone = get_matanyone_model(checkpoint, device=device)
-        print(f"Loaded MatAnyone model to {device} with max size {max_size}")
+        print(f"Loaded Matte model to {device} with max size {max_size}")
         
         # Initialize inference processor
         self.processor = InferenceCore(matanyone, cfg=matanyone.cfg, device=device)
@@ -375,7 +375,7 @@ class MatAnyManager:
         """Unload the MatAnyone model and clear cache"""
         self.processor = None
         DeviceManager.clear_cache()
-        print("Unloaded MatAnyone model")
+        print("Unloaded Matte model")
         
     def offload_model_to_cpu(self):
         """Offload MatAnyone model to CPU to free VRAM"""
@@ -965,16 +965,16 @@ class RemovalManager:
         resized_h, resized_w = blank_image.shape[:2]
 
         # Create progress dialog
-        progress_dialog = QProgressDialog("Loading MiniMax-Remover model...", "Cancel", 0, 0, parent_window)
+        progress_dialog = QProgressDialog("Loading Paint model...", "Cancel", 0, 0, parent_window)
         progress_dialog.setWindowTitle("Object Removal Progress")
         progress_dialog.show()
-        print(f"Loading MiniMax-Remover model to {device} with resolution {resized_w}x{resized_h}...")
+        print(f"Loading Paint model to {device} with resolution {resized_w}x{resized_h}...")
         QApplication.processEvents()
 
         # Load model
         self.load_minimax_model()
         if self.pipe is None:
-            print("Error loading MiniMax-Remover model")
+            print("Error loading Paint model")
             progress_dialog.close()
             return 0
 

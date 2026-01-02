@@ -2055,7 +2055,7 @@ class MainWindow(QMainWindow):
         count = len(self.point_manager.points)
         if count > 0:  
             #load models
-            print("Loading MatAnyone model...")
+            print("Loading Matte model...")
             QApplication.processEvents()
             self.sam_manager.offload_model_to_cpu()
             #self.matany_manager.load_model_to_device()
